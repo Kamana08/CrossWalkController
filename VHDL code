@@ -1,0 +1,120 @@
+-- VHDL Code for Cross walk Controller
+
+library IEEE;                   -- Header File Declaration 
+use IEEE.std_logic_1164.all;
+use IEEE.std_logic_unsigned.all;
+
+entity Kamana_CrossWalkController is      	 -- Entity Declaration
+port(	LedR     :out std_logic;
+		LedG     :out std_logic;
+		LedY     :out std_logic;
+		BUTTON	:in std_logic;
+		RESET    :in std_logic;
+      CLK		:in std_logic );
+		
+end Kamana_CrossWalkController;
+
+architecture data of Kamana_CrossWalkController is
+type state_type is (Red , RedW , Yellow , YellowW , Green , GreenW);
+
+signal state : state_type;
+signal count : std_logic_vector(3 downto 0);
+
+constant Sec9 : std_logic_vector(3 downto 0) := "1001";
+constant Sec4  : std_logic_vector(3 downto 0) := "0100";
+constant Sec2  : std_logic_vector(3 downto 0) := "0010";
+
+begin
+process(CLK,RESET, BUTTON) begin
+if RESET = '1' then
+state<= Green;
+count<= x"0";
+
+elsif (rising_edge(CLK)) and BUTTON = '1' then
+
+case (state) is 
+		 
+when Green =>
+			state <= GreenW;
+						
+when GreenW =>
+		if count < sec2 then
+			state <= GreenW;
+			count <= count + '1';
+			else
+			state <= Yellow;
+			count <= x"0";
+		end if;
+		
+when Yellow =>
+			state <= YellowW;
+				
+when YellowW =>
+		if count < Sec4 then
+			state <= YellowW;
+			count <= count + '1';
+		else
+			state <= Red;
+			count <= x"0";
+		end if;
+
+when Red =>
+			state <= RedW;
+						
+when RedW =>
+		if count < Sec9 then
+			state <= RedW;
+			count <= Count + '1';
+		else
+			state <= Green;
+			count <= x"0";
+		end if;
+		
+when others =>
+state <= Green;
+
+end case;
+end if;
+end process;
+
+C2: 
+process(state)
+begin
+
+case state is
+
+when Green => 
+LedG <=	'1';
+LedR <=  '0';
+LedY <=  '0';
+
+when GreenW => 
+LedG <=	'1';
+LedR <=  '0';
+LedY <=  '0';
+
+when Yellow	=>
+LedY <=	'1';
+LedG <=	'0';
+LedR <=  '0';
+
+when YellowW =>
+LedY <=	'1';
+LedG <=	'0';
+LedR <=  '0';
+ 
+when Red   =>
+LedR <=	'1';
+LedG <=	'0';
+LedY <=  '0'; 
+
+when RedW  =>
+LedR <=	'1';
+LedG <=	'0';
+LedY <=  '0';  
+
+end case;
+end process;
+
+end data;
+			 
