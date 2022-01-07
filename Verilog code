@@ -1,0 +1,199 @@
+module Kamana_CrossWalk_Verilog
+(
+    input clk,btn,
+	 output reg [6:0] HEX,
+    output reg Green,
+    output reg Yellow,
+    output reg Red
+);
+	 reg GreenWait;
+	 reg YellowWait;
+	 reg RedWait;
+	 reg newclk=0;
+	 reg [21:0] count2 = 22'd0;
+    parameter  S1=0, S2=1, S3 =2, S4=3, S5=4,S6=5;
+    reg [3:0]count;
+    reg[2:0] ps;
+    parameter  sec9=9,sec2=2,sec4=4, sec0=0;
+
+   
+    
+    always@(posedge clk)
+        begin
+		  count2 = count2 + 1;
+		  newclk = count2[4];
+
+		  if(btn | newclk == 1)
+          begin
+            case(ps)
+                S1: if(count<sec0)
+                        begin
+                        ps<=S1;
+                        count<=count+1;
+                        end
+                    else
+                        begin
+                        ps<=S2;
+                        count<=0;
+                        end
+                S2: if(count<sec2)
+                        begin
+                        ps<=S2;
+                        count<=count+1;
+                        end
+
+                    else
+                        begin
+                        ps<=S3;
+                        count<=0;
+                        end
+                S3: if(count<sec0)
+                        begin
+                        ps<=S3;
+                        count<=count+1;
+                        end
+
+                    else
+                        begin
+                        ps<=S4;
+                        count<=0;
+                        end
+                S4:if(count<sec4)
+                        begin
+                        ps<=S4;
+                        count<=count+1;
+                        end
+
+                    else
+                        begin
+                        ps<=S5;
+                        count<=0;
+                        end
+                S5:if(count<sec0)
+                        begin
+                        ps<=S5;
+                        count<=count+1;
+                        end
+
+                    else
+                        begin
+                        ps<=S6;
+                        count<=0;
+                        end
+
+                S6:if(count<sec9)
+                        begin
+                        ps<=S6;
+                        count<=count+1;
+                        end
+
+                    else
+                        begin
+                        ps<=S1;
+                        count<=0;
+                        end
+                default: ps<=S1;
+                endcase
+					end
+            end   
+
+            always@(ps or count)    
+            begin
+                
+                case(ps)
+                     
+                    S1:
+                    begin
+                       Red <=1'b0;
+							  RedWait <= 1'b0;
+                       Green <=1'b1;
+							  GreenWait <=1'b0;
+                       Yellow <=1'b0;
+                       YellowWait <=1'b0;
+                    end
+                    S2:
+                    begin 
+                       Red <=1'b0;
+							  RedWait <= 1'b0;
+                       Green <=1'b1;
+							  GreenWait <=1'b1;
+                       Yellow <=1'b0;
+                       YellowWait <=1'b0;
+							  case (count)
+							  4'b0000 : HEX = 7'b1001111;   //1
+							  4'b0001 : HEX = 7'b0010010;   //2
+							  4'b0010 : HEX = 7'b0000110;   //3
+							  default : HEX = 7'bXXXXXXX;   
+							  endcase								
+                    end 
+                    S3:
+                    begin
+                       Red <=1'b0;
+							  RedWait <= 1'b0;
+                       Green <=1'b0;
+							  GreenWait <=1'b0;
+                       Yellow <=1'b1;
+                       YellowWait <=1'b0;
+                    end
+                    S4:
+                    begin
+                       Red <=1'b0;
+							  RedWait <= 1'b0;
+                       Green <=1'b0;
+							  GreenWait <=1'b0;
+                       Yellow <=1'b1;
+                       YellowWait <=1'b1;
+							  case (count)
+							  4'b0000 : HEX = 7'b1001111;    //1
+							  4'b0001 : HEX = 7'b0010010;    //2
+							  4'b0010 : HEX = 7'b0000110;    //3
+							  4'b0011 : HEX = 7'b1001100;    //4
+							  4'b0100 : HEX = 7'b0100100;    //5
+							  default : HEX = 7'bXXXXXXX;    //6
+							  endcase								
+                    end
+                    S5:
+                    begin
+                       Red <=1'b1;
+							  RedWait <= 1'b0;
+                       Green <=1'b0;
+							  GreenWait <=1'b0;
+                       Yellow <=1'b0;
+                       YellowWait <=1'b0;
+                    end
+                    S6:
+                    begin 
+                       Red <=1'b1;
+							  RedWait <= 1'b1;
+                       Green <=1'b0;
+							  GreenWait <=1'b0;
+                       Yellow <=1'b0;
+                       YellowWait <=1'b0;
+							  case (count)
+							  4'b0000 : HEX = 7'b1001111;   //1
+							  4'b0001 : HEX = 7'b0010010;   //2
+							  4'b0010 : HEX = 7'b0000110;   //3
+							  4'b0011 : HEX = 7'b1001100;   //4
+							  4'b0100 : HEX = 7'b0100100;   //5
+							  4'b0101 : HEX = 7'b0100000;   //6
+							  4'b0110 : HEX = 7'b0001111;   //7
+							  4'b0111 : HEX = 7'b0000000;   //8
+				           4'b1000 : HEX = 7'b0001100;   //9
+				           4'b1001 :	HEX = 7'b0001000;	  //a
+							  default : HEX = 7'bXXXXXXX;
+							  endcase
+                    end
+                    default:
+                    begin 
+                       Red <=1'b0;
+							  RedWait <= 1'b0;
+                       Green <=1'b0;
+							  GreenWait <=1'b0;
+                       Yellow <=1'b0;
+                       YellowWait <=1'b0;
+                    end
+                    endcase
+            end                
+              
+    
+endmodule
